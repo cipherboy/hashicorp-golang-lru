@@ -180,3 +180,13 @@ func (c *LRU[K, V]) removeElement(e *internal.Entry[K, V]) {
 		c.onEvict(e.Key, e.Value)
 	}
 }
+
+func (c *LRU[K, V]) Clone() LRUCache[K, V] {
+	evictList, items := c.evictList.Clone()
+	return &LRU[K, V]{
+		size:      c.size,
+		evictList: evictList,
+		items:     items,
+		onEvict:   nil,
+	}
+}

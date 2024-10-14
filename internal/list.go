@@ -140,3 +140,24 @@ func (l *LruList[K, V]) MoveToFront(e *Entry[K, V]) {
 	// see comment in List.Remove about initialization of l
 	l.move(e, &l.root)
 }
+
+// Clones a list into a new list from scratch.
+func (l *LruList[K, V]) Clone() (*LruList[K, V], map[K]*Entry[K, V]) {
+	l.lazyInit()
+
+	v := NewList[K, V]()
+	mapping := make(map[K]*Entry[K, V], l.len)
+
+	if l.len == 0 {
+		return v, mapping
+	}
+
+	// Remove and rebuild both lists in parallel.
+	root := l.root.prev
+	for root != l.root.prev {
+		mapping[root.Key] = v.PushFrontExpirable(root.Key, root.Value, root.ExpiresAt)
+		root = root.prev
+	}
+
+	return v, mapping
+}

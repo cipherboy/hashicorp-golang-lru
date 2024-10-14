@@ -253,3 +253,20 @@ func (c *Cache[K, V]) Len() int {
 func (c *Cache[K, V]) Cap() int {
 	return c.lru.Cap()
 }
+
+// Clone a cache into a new version (creating a warm cache). Takes an explicit
+// callback handler in case the original should not be used.
+func (c *Cache[K, V]) Clone() *Cache[K, V] {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
+	ret := &Cache[K, V]{
+		lru:         c.lru.Clone().(*simplelru.LRU[K, V]),
+		evictedKeys: make([]K, len(c.evictedKeys)),
+		evictedVals: make([]V, len(c.evictedVals)),
+	}
+
+	copy(ret.evictedKeys, c.evictedKeys)
+	copy(ret.evictedVals, c.evictedVals)
+	return ret
+}

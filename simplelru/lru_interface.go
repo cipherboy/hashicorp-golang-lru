@@ -46,4 +46,6 @@ type LRUCache[K comparable, V any] interface {
 
 	// Resizes cache, returning number evicted
 	Resize(int) int
+
+	Clone() LRUCache[K, V]
 }

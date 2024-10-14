@@ -270,3 +270,19 @@ func (c *TwoQueueCache[K, V]) Peek(key K) (value V, ok bool) {
 	}
 	return c.recent.Peek(key)
 }
+
+// Clone a cache into a new version (creating a warm cache).
+func (c *TwoQueueCache[K, V]) Clone() *TwoQueueCache[K, V] {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return &TwoQueueCache[K, V]{
+		size:        c.size,
+		recentSize:  c.recentSize,
+		recentRatio: c.recentRatio,
+		ghostRatio:  c.ghostRatio,
+
+		recent:      c.recent.Clone(),
+		frequent:    c.frequent.Clone(),
+		recentEvict: c.recentEvict.Clone(),
+	}
+}

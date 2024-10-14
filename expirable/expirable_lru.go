@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/golang-lru/v2/internal"
+	"github.com/hashicorp/golang-lru/v2/simplelru"
 )
 
 // EvictCallback is used to get a callback when a cache entry is evicted
@@ -343,4 +344,10 @@ func (c *LRU[K, V]) removeFromBucket(e *internal.Entry[K, V]) {
 // Cap returns the capacity of the cache
 func (c *LRU[K, V]) Cap() int {
 	return c.size
+}
+
+// Clone a cache into a new version (creating a warm cache). Takes an explicit
+// callback handler in case the original should not be used.
+func (c *LRU[K, V]) Clone() simplelru.LRUCache[K, V] {
+	return nil
 }
